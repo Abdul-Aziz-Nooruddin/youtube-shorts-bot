@@ -1,0 +1,12 @@
+# Secrets — never commit these
+.env
+client_secrets.json
+token.pickle
+
+# Temp files
+output/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+Thumbs.db

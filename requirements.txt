@@ -1,0 +1,9 @@
+requests
+edge-tts
+Pillow
+moviepy==1.0.3
+numpy
+schedule
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
