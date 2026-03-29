@@ -1,10 +1,41 @@
-import requests, json, random
+import requests, json, random, os
 from config import GROQ_API_KEY, TOPICS, NUM_FACTS
+
+USED_FILE = "used_topics.json"
+
+def _load_used():
+    if os.path.exists(USED_FILE):
+        with open(USED_FILE, "r") as f:
+            return json.load(f)
+    return []
+
+def _save_used(used):
+    with open(USED_FILE, "w") as f:
+        json.dump(used, f, indent=2)
+
+def _pick_topic():
+    used = _load_used()
+
+    # All topics used — reset and start fresh
+    remaining = [t for t in TOPICS if t not in used]
+    if not remaining:
+        print("[Script] All topics used — resetting list")
+        used = []
+        _save_used(used)
+        remaining = TOPICS[:]
+
+    # Pick a random unused topic
+    topic = random.choice(remaining)
+    used.append(topic)
+    _save_used(used)
+
+    print(f"[Script] Topic: {topic}")
+    print(f"[Script] Used {len(used)}/{len(TOPICS)} topics total")
+    return topic
 
 def generate_video_content(topic=None):
     if topic is None:
-        topic = random.choice(TOPICS)
-    print(f"[Script] Topic: {topic}")
+        topic = _pick_topic()
 
     prompt = f"""You create viral YouTube Shorts for a facts channel.
 Topic: {topic}
@@ -52,6 +83,7 @@ Generate exactly {NUM_FACTS} facts. Keep every narration under 20 words."""
         data = json.loads(content.strip())
         print(f"[Script] OK: {data['title']}")
         return data
+
     except Exception as e:
         print(f"[Script] Error: {e}")
         raise
